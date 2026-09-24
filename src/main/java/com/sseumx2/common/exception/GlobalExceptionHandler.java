@@ -2,8 +2,8 @@ package com.sseumx2.common.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,10 +24,19 @@ public class GlobalExceptionHandler {
 				.body(ErrorResponse.of("INVALID_REQUEST", message));
 	}
 
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+			HttpMessageNotReadableException exception
+	) {
+		log.warn("Failed to read request body. message={}", exception.getMessage());
+		return ResponseEntity.badRequest()
+				.body(ErrorResponse.of("INVALID_REQUEST", "요청 본문 형식이 올바르지 않습니다."));
+	}
+
 	@ExceptionHandler(MessageParsingException.class)
 	public ResponseEntity<ErrorResponse> handleMessageParsingException(MessageParsingException exception) {
 		log.warn("Failed to parse payment message. message={}", exception.getMessage());
-		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+		return ResponseEntity.status(422)
 				.body(ErrorResponse.of("MESSAGE_PARSE_FAILED", exception.getMessage()));
 	}
 
