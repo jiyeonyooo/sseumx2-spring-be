@@ -37,4 +37,5 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.internalServerError()
 				.body(ErrorResponse.of("INTERNAL_SERVER_ERROR", "서버 오류가 발생했습니다."));
 	}
+
 }
